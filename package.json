@@ -1,0 +1,31 @@
+{
+  "name": "@rockyskills/rw-skills",
+  "version": "0.1.0",
+  "description": "中文 AI Agent Skills：开发计划、任务依赖与进度追溯",
+  "license": "MIT",
+  "author": "rockywu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rockywu/rw-skills.git"
+  },
+  "homepage": "https://github.com/rockywu/rw-skills#readme",
+  "bugs": {
+    "url": "https://github.com/rockywu/rw-skills/issues"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "docs/npm-distribution.md",
+    "traceable-development/**/*.md"
+  ],
+  "keywords": [
+    "agent-skills",
+    "codex",
+    "chinese",
+    "development-planning"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
