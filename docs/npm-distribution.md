@@ -1,75 +1,46 @@
-# npm 分发说明
+# npm 发布说明
 
-## 包与安装方式
+包名：`@rockyskills/rw-skills`。组织：`rockyskills`。许可证：MIT。
 
-包名：`@rockyskills/rw-skills`。发布组织：`rockyskills`。首版：`0.1.0`。
+`0.1.x` 只包含 Skill 内容。从 `0.2.0` 起，包包含自己的 `rw-skills` 安装入口。安装器使用 Node.js 标准库，直接复制到 Agent 的标准 Skill 目录，不依赖第三方安装工具。
 
-一个纯内容包分发本仓库的全部 Skill。安装时复用 [Vercel Labs skills](https://github.com/vercel-labs/skills)，不维护自己的安装器。
-
-| 方式 | 内容来源 | 安装命令 |
-|---|---|---|
-| GitHub 仓库 | 仓库当前内容 | `npx --yes skills@1.7.2 add rockywu/rw-skills` |
-| npm 固定版本 | registry 的版本归档 | 使用下面的 `.tgz` 下载地址 |
-
-安装到当前项目的 Codex：
+## 安装入口
 
 ```bash
-npx --yes skills@1.7.2 add \
-  https://registry.npmjs.org/@rockyskills/rw-skills/-/rw-skills-0.1.0.tgz \
-  --skill traceable-development --agent codex --copy --yes
+npx --yes @rockyskills/rw-skills@0.2.0 list
+npx --yes @rockyskills/rw-skills@0.2.0 install --agent codex,claude,cursor --global
 ```
 
-全局安装增加 `--global`。`skills@1.7.2` 要求 Node.js `>=22.20.0`。
+完整支持清单、安装范围、冲突处理和调用示例见 [README](../README.md)。`npm install` 下载包，不自动写入 Skill 目录。安装必须通过明确的 `install` 命令执行。
 
-`npm install` 只下载 npm 包，不会自动把 Skill 放进 Codex 的发现目录。内容包没有 `bin` 或 `postinstall`，不支持直接执行 `npx @rockyskills/rw-skills`，也不会在 npm 安装时修改用户的 Skill 目录。
+## 发布前检查
 
-## 包配置
+1. 核对 `package.json` 的版本、MIT 许可证、`bin` 入口和 `engines`。
+2. 执行 `npm test`。测试使用临时目录，不修改真实 Agent 目录。
+3. 执行 `npm pack --dry-run`。核对包内包含 `bin/`、测试、`LICENSE`、README、全部 Skill 及辅助文件。`prepack` 会运行测试。
+4. 执行 `npm pack`，在临时项目用生成的 `.tgz` 运行 CLI 并验证安装。
+5. 提交并推送 GitHub，再公开发布。新增 Skill 时同步更新 README 完整清单及发布文件白名单。
 
-以根目录的 [package.json](../package.json) 为准。文件白名单包含 MIT 许可证、仓库介绍、分发说明、Skill 介绍、`SKILL.md` 和模板，排除 `.DS_Store`、Git 文件和临时归档。
-
-仓库及内容包采用 [MIT License](../LICENSE)，`package.json` 的 `license` 为 `MIT`，包内包含 `LICENSE`。新增 Skill 时同步扩展白名单。
-
-纯内容包没有运行时依赖，不需要构建步骤。
-
-## 发布顺序
-
-1. 确认版本与包内容，运行 `npm pack --dry-run` 检查白名单。
-2. 用 `npm pack` 生成归档；从归档执行安装，检查 Skill 和辅助文件完整性。
-3. 提交仓库，再推送到 GitHub 的 `main` 分支。不要把与发布无关的本地改动加入提交。
-4. 用 `npm whoami --registry=https://registry.npmjs.org/` 检查账号，用 `npm org ls rockyskills --json --registry=https://registry.npmjs.org/` 核对组织权限。
-5. 在 npm 要求的本人认证可完成时，执行发布：
+## 发布与认证
 
 ```bash
+npm whoami --registry=https://registry.npmjs.org/
 npm publish --access public --registry=https://registry.npmjs.org/
 ```
 
-6. 查询 registry 中的真实版本和下载地址：
+需要账号拥有 `rockyskills` 组织的发布权限。按 npm 提示在浏览器完成本人认证和 2FA。已有版本不能覆盖，后续发布需增加版本号。
+
+发布后确认：
 
 ```bash
-npm view @rockyskills/rw-skills version dist.tarball \
-  --registry=https://registry.npmjs.org/
+npm view @rockyskills/rw-skills version bin license --registry=https://registry.npmjs.org/
 ```
 
-7. 从查询返回的下载地址在临时项目安装，并比较 `SKILL.md` 和模板与已提交版本的内容。
-
-后续发布必须增加版本号。同一个已发布版本不能覆盖。Git 推送成功不等于 npm 已发布，npm 已发布也不等于实际任务效果已经验收。
-
-## 已完成的准备验证（2026-10-13，Asia/Shanghai）
-
-- GitHub 仓库 `rockywu/rw-skills` 为公开仓库。
-- 现有 Skill 为 `traceable-development`，入口和模板文件齐全。
-- Codex 内置安装脚本、GitHub 远程安装、本地目录安装和本地 HTTP 下载 `.tgz` 安装均已在临时目录验证成功。
-- 已安装的 `SKILL.md` 和模板内容与仓库一致。
-- 试验 npm 内容包的白名单检查通过，未包含 `.DS_Store` 或 Git 文件。
-- 本机 Node.js 为 `24.19.0`，npm 为 `11.17.0`，满足安装工具要求。
-- npm 命令行账号已验证为 `rockywu`，在 `rockyskills` 组织中具有 owner 权限。
-
-以上记录证明安装文件完整性，不代表 Skill 的实际任务效果验收。真实 registry 的发布结果与发布后安装结果，以本次执行输出为准。
+随后按 README 命令从真实 registry 安装到临时项目，并核对 `SKILL.md`、模板和 MIT 许可证。Git 推送成功、npm 发布成功、文件安装通过和 Agent 实际任务效果是不同的验证结果，应分别记录。
 
 ## 参考
 
-- [npm：创建和发布公开 scope 包](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages)
-- [Vercel Labs skills：安装方式与参数](https://github.com/vercel-labs/skills)
-- [OpenAI：Skill 结构、发现目录和插件分发建议](https://developers.openai.com/codex/skills/)
+- [npm：发布公开 scope 包](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages)
+- [npm：package.json 的 bin 入口](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#bin)
 
-OpenAI 官方建议将面向其他用户的可复用 Skill 打包为插件。npm 内容包提供文件分发，不会自动进入 ChatGPT 或 Codex 的插件目录。
+本包通过 npm 分发本地 Skill 文件，不会自动进入 Agent 的插件目录。

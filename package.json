@@ -1,8 +1,19 @@
 {
   "name": "@rockyskills/rw-skills",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "中文 AI Agent Skills：开发计划、任务依赖与进度追溯",
   "license": "MIT",
+  "type": "module",
+  "bin": {
+    "rw-skills": "bin/rw-skills.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "prepack": "npm test"
+  },
   "author": "rockywu",
   "repository": {
     "type": "git",
@@ -15,6 +26,8 @@
   "files": [
     "README.md",
     "LICENSE",
+    "bin/",
+    "test/",
     "docs/npm-distribution.md",
     "traceable-development/**/*.md"
   ],

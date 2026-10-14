@@ -2,12 +2,12 @@
 
 中文 AI Agent Skill 仓库。将开发协作方法写成可安装、可调用的 Skill，供 AI 编程助手使用。
 
-[GitHub 仓库](https://github.com/rockywu/rw-skills) · [npm 内容包 @rockyskills/rw-skills](https://www.npmjs.com/package/@rockyskills/rw-skills)
+[GitHub 仓库](https://github.com/rockywu/rw-skills) · [npm 包 @rockyskills/rw-skills](https://www.npmjs.com/package/@rockyskills/rw-skills)
 
 ## 文档目录
 
 - [工程中的全部 Skill](#工程中的全部-skill)
-- [安装文档](#安装文档)：环境要求、npm 安装、GitHub 安装、安装范围和检查方法。
+- [安装文档](#安装文档)：环境要求、直接安装、多 Agent 支持、安装范围和检查方法。
 - [使用文档](#使用文档)：调用方式、输入资料、使用示例和预期产出。
 - [更新与卸载](#更新与卸载)
 - [新增 Skill](#新增-skill)
@@ -27,9 +27,11 @@ Skill 名称用于安装参数和调用。中文名称用于阅读说明。它�
 
 ### 1. 环境要求
 
-- 使用 Codex。其他助手的支持范围见 [Vercel Labs skills](https://github.com/vercel-labs/skills)，本仓库目前验证的是 Codex 安装。
-- Node.js `>=22.20.0`，以及可用的 `npm`、`npx`。
-- 能访问 npm registry。使用 GitHub 安装方式时，也需要能访问 GitHub。
+- Node.js `>=20`，以及可用的 `npm`、`npx`。
+- 使用下表中支持 Agent Skills 的本地 Agent 版本。
+- 通过 npm 安装时，能访问 npm registry。
+
+从 **`0.2.0` 起**，本包提供自己的安装命令，使用 Node.js 标准库，没有第三方安装依赖。旧版 `0.1.x` 只有 Skill 内容，不包含这个入口。以下 npm 命令需要先发布 `0.2.0`。
 
 检查环境：
 
@@ -38,94 +40,106 @@ node --version
 npm --version
 ```
 
-安装使用第三方工具 `skills@1.7.2`。`@rockyskills/rw-skills` 是包含 Skill、介绍和模板的内容包，没有可执行入口。`npm install @rockyskills/rw-skills` 只下载包，不能代替下面的 Skill 安装步骤。
+### 2. 支持的 Agent 与安装目录
 
-### 2. 从 npm 安装全部 Skill
+| Agent | `--agent` 参数 | 项目目录 | 全局目录 | 官方说明 |
+|---|---|---|---|---|
+| Codex | `codex` | `.agents/skills/` | `~/.agents/skills/` | [文档](https://developers.openai.com/codex/skills/) |
+| Claude Code | `claude` | `.claude/skills/` | `~/.claude/skills/` | [文档](https://code.claude.com/docs/en/skills) |
+| Cursor | `cursor` | `.cursor/skills/` | `~/.cursor/skills/` | [文档](https://cursor.com/docs/context/skills) |
+| Gemini CLI | `gemini` | `.gemini/skills/` | `~/.gemini/skills/` | [文档](https://geminicli.com/docs/cli/skills/) |
+| OpenCode | `opencode` | `.opencode/skills/` | `~/.config/opencode/skills/` | [文档](https://opencode.ai/docs/skills/) |
+| GitHub Copilot | `copilot` | `.github/skills/` | `~/.copilot/skills/` | [文档](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) |
 
-先取得 npm 当前最新版本的下载地址：
+全局目录中的 `~` 表示当前用户的主目录。项目目录相对于执行命令时的当前目录，请在目标项目根目录运行。全局安装面向本地 Agent；云端使用需要按 Agent 的官方规则配置。
 
-```bash
-rw_skills_tarball="$(npm view @rockyskills/rw-skills dist.tarball --registry=https://registry.npmjs.org/)"
-```
+目录规则已按官方文档核对，六种 Agent 的项目与全局文件安装均使用临时目录验证。尚未逐一启动六种 Agent 验证任务执行效果。部分 Agent 也会扫描其他 Agent 的兼容目录，重复安装可能出现重复条目；按自己实际使用的 Agent 选择目标即可。
 
-然后将全部 Skill 全局安装到 Codex，所有项目均可使用：
+### 3. 安装全部 Skill
 
-```bash
-npx --yes skills@1.7.2 add "$rw_skills_tarball" \
-  --skill '*' --agent codex --global --copy --yes
-```
-
-全局目录为 `~/.agents/skills/`。`--skill '*'` 表示安装内容包中的全部 Skill，单引号用于防止 shell 展开星号。当前包只有 `traceable-development`，以后新增 Skill 时不需要逐个填写名称。
-
-如果只需要当前项目使用，在该项目根目录执行下面的命令：
+在目标项目根目录安装到 Codex：
 
 ```bash
-npx --yes skills@1.7.2 add "$rw_skills_tarball" \
-  --skill '*' --agent codex --copy --yes
+npx --yes @rockyskills/rw-skills@0.2.0 install --agent codex
 ```
 
-项目目录为 `.agents/skills/`。以上命令中的下载地址变量需在同一个终端中设置。安装前检查同名 Skill；有自定义内容时先备份，再决定是否替换。
-
-### 3. 只安装一个 Skill
-
-使用清单中的名称替换 `--skill '*'`。例如全局安装可追溯开发协作：
+全局安装到 Claude Code：
 
 ```bash
-npx --yes skills@1.7.2 add "$rw_skills_tarball" \
-  --skill traceable-development --agent codex --global --copy --yes
+npx --yes @rockyskills/rw-skills@0.2.0 install --agent claude --global
 ```
 
-需要固定版本时，取得指定版本的地址即可。例如已经发布的 `0.1.0`：
+同时安装到 Codex、Claude Code 和 Cursor：
 
 ```bash
-rw_skills_tarball="$(npm view @rockyskills/rw-skills@0.1.0 dist.tarball --registry=https://registry.npmjs.org/)"
+npx --yes @rockyskills/rw-skills@0.2.0 install --agent codex,claude,cursor --global
 ```
 
-### 4. 从 GitHub 安装
+默认安装包中的全部 Skill。`--agent` 必填，支持逗号分隔或重复传入；`--global` 可选，不传则安装到当前项目。安装器复制完整 Skill 目录、辅助文件和 MIT 许可证，不创建符号链接，不修改 Agent 配置。
 
-先列出仓库中的全部 Skill：
+`npx --yes` 只自动确认下载这个 npm 包。同名 Skill 目录或链接已存在时，安装器仍会停止。请先备份并将旧目录移出 Agent 的 Skill 目录，再重新安装。
+
+### 4. 只安装一个 Skill
 
 ```bash
-npx --yes skills@1.7.2 add rockywu/rw-skills --list
+npx --yes @rockyskills/rw-skills@0.2.0 install \
+  --agent cursor --skill traceable-development
 ```
 
-全局安装全部 Skill：
+`--skill` 的名称来自本页完整清单，可以重复传入以选择多个 Skill。未知名称会报错，不会安装到其他位置。
+
+查看本包可安装的 Skill：
 
 ```bash
-npx --yes skills@1.7.2 add rockywu/rw-skills \
-  --skill '*' --agent codex --global --copy --yes
+npx --yes @rockyskills/rw-skills@0.2.0 list
 ```
 
-仅安装到当前项目时去掉 `--global`。仅安装单个 Skill 时，将 `'*'` 替换为清单中的 Skill 名称。
+查看命令帮助：
 
-### 5. 检查安装结果
+```bash
+npx --yes @rockyskills/rw-skills@0.2.0 --help
+```
 
-全局安装后，应至少存在以下两个文件：
+`list` 列出当前包的 Skill，不扫描本机已经安装的其他 Skill。
+
+### 5. 不通过 npm 安装
+
+从 GitHub 克隆仓库后，也可以直接运行仓库中的安装入口。项目安装前，先切换到目标项目目录，再用实际克隆路径替换以下路径：
+
+```bash
+node /path/to/rw-skills/bin/rw-skills.mjs install --agent codex
+```
+
+全局安装同样增加 `--global`。这个入口只使用 Node.js 标准库，无需先运行 `npm install`。
+
+也可以手动复制完整的 `traceable-development/` 到上表对应目录，并保留 `references/` 和仓库的 MIT `LICENSE`。
+
+### 6. 检查安装结果
+
+例如 Codex 全局安装后，应至少存在以下文件：
 
 ```text
 ~/.agents/skills/traceable-development/SKILL.md
 ~/.agents/skills/traceable-development/references/templates.md
+~/.agents/skills/traceable-development/LICENSE
 ```
 
-项目安装时，检查当前项目的 `.agents/skills/traceable-development/`。
-
-也可以使用安装工具查看已安装清单：
-
-```bash
-# 全局安装清单
-npx --yes skills@1.7.2 list --global --agent codex
-
-# 当前项目安装清单
-npx --yes skills@1.7.2 list --agent codex
-```
-
-Codex 会自动发现新增 Skill。如果列表中没有出现，可以重启 Codex。手动安装时，也必须复制完整的 Skill 目录，保留 `references/`，不能只复制 `SKILL.md`。
+其他 Agent 检查上表对应目录。重新打开 Agent 会话并查看它提供的 Skill 清单；未出现时核对版本是否支持 Skills，以及所选安装范围。
 
 ## 使用文档
 
 ### 1. 调用 Skill
 
-在 Codex 对话中输入 `$traceable-development`，然后说明目标、范围和约束。在支持 Skill 选择器的界面，也可以选择该 Skill 后发送任务。
+安装完成后，按所用 Agent 的调用方式发送任务：
+
+| Agent | 调用方式 |
+|---|---|
+| Codex | 输入 `$traceable-development`，再描述任务 |
+| Claude Code | 输入 `/traceable-development`，再描述任务 |
+| Cursor | 在 Agent 聊天输入 `/`，搜索并选择 `traceable-development` |
+| Gemini CLI、OpenCode、GitHub Copilot | 明确要求使用 `traceable-development` 处理开发计划；在 Agent 的 Skill 功能中核对是否已发现 |
+
+以下示例采用 Codex 的 `$traceable-development`。其他 Agent 替换为其调用方式，任务要求可以保持一致。
 
 安装 Skill 不等于调用它。调用 Skill 也不等于授权推送、合并或发布；需要执行这些操作时，应在任务中说明。
 
@@ -178,15 +192,9 @@ $traceable-development
 
 ## 更新与卸载
 
-`--copy` 会保存本地副本，npm 或 GitHub 内容更新后不会自动同步。更新时重新取得最新下载地址，并重新运行所选安装命令；自定义内容先备份。
+安装保存的是本地副本，发布新版本不会自动同步。更新时先将原 Skill 文件夹移出 Agent 的 Skill 目录进行备份，再运行新版本的安装命令。安装器不会覆盖旧内容。
 
-卸载全局的可追溯开发协作 Skill：
-
-```bash
-npx --yes skills@1.7.2 remove traceable-development --agent codex --global
-```
-
-卸载项目版本时，在目标项目根目录执行，并去掉 `--global`。卸载前确认其中没有需要保留的自定义内容。
+卸载时，备份自定义内容后，在上表对应目录中删除本仓库的 Skill 文件夹。例如 Codex 全局版本对应 `~/.agents/skills/traceable-development/`。不要删除同目录下其他来源的 Skill。
 
 ## 新增 Skill
 
@@ -203,7 +211,7 @@ skill-name/
 
 ## 发布说明
 
-npm 包归属 `rockyskills` 组织。更新已发布的 README 需要发布新的 npm 版本，GitHub 的修改不会自动更新已有 npm 版本的 README。
+npm 包归属 `rockyskills` 组织。当前安装器准备为 `0.2.0`。更新已发布的 README 或安装器需要发布新的 npm 版本，GitHub 修改不会自动更新已有 npm 版本。
 
 发布配置与流程见 [npm 分发说明](https://github.com/rockywu/rw-skills/blob/main/docs/npm-distribution.md)。已发布的同版本不能覆盖。
 
