@@ -46,7 +46,7 @@ npm publish --access public --registry=https://registry.npmjs.org/
 6. 查询 registry 中的真实版本和下载地址：
 
 ```bash
-npm view @rockyskills/rw-skills@0.1.0 version dist.tarball \
+npm view @rockyskills/rw-skills version dist.tarball \
   --registry=https://registry.npmjs.org/
 ```
 
