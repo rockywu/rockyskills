@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信撤回消息线索"
+  short_description: "先取得昵称和时间段，再从本机通知残留查找微信撤回消息的可能原文"
+  default_prompt: "使用 $wechat-withdraw 查找某人的微信撤回消息线索，开始读取数据前先取得昵称和完整时间段。"

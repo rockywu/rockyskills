@@ -15,11 +15,14 @@
 
 ## 工程中的全部 Skill
 
-当前工程共 **1 个 Skill**。以下按工程中的 `SKILL.md` 列出完整清单。
+当前工程共 **2 个 Skill**。以下按工程中的 `SKILL.md` 列出完整清单。
 
 | Skill 名称 | 中文名称 | 适用任务 | 预期产出 | 详细文档 |
 |---|---|---|---|---|
 | `traceable-development` | 可追溯开发协作 | 开发计划、任务拆分、依赖与排期、进度跟踪、审查和交接 | 沿用项目结构的主计划；按需补充任务卡、需求与任务关联、依赖、验收证据和 Git 记录 | [介绍与示例](https://github.com/rockywu/rw-skills/blob/main/traceable-development/README.md) · [完整规则](https://github.com/rockywu/rw-skills/blob/main/traceable-development/SKILL.md) · [文档模板](https://github.com/rockywu/rw-skills/blob/main/traceable-development/references/templates.md) |
+| `wechat-withdraw` | 微信撤回消息线索 | 先取得昵称和时间段，再只读查找 macOS 本机微信通知残留 | 匹配的通知原文、时间与证据位置；明确是否已关联撤回事件 | [完整规则](wechat-withdraw/SKILL.md) |
+
+`wechat-withdraw` 使用 Python 3.9+ 标准库，不承诺恢复全部撤回内容。调用示例：`$wechat-withdraw 帮我查某人的撤回消息`；助手会先询问昵称、日期、起止时间，并明确时区。当前仓库入口可通过 `node bin/rw-skills.mjs install --agent codex --skill wechat-withdraw` 安装；npm 已发布版本是否包含它，以该版本的 `list` 输出为准。
 
 Skill 名称用于安装参数和调用。中文名称用于阅读说明。它不提供后台调度或任务管理服务；实际执行仍由助手依据用户要求完成。
 

@@ -29,7 +29,8 @@
     "bin/",
     "test/",
     "docs/npm-distribution.md",
-    "traceable-development/**/*.md"
+    "traceable-development/**/*.md",
+    "wechat-withdraw/"
   ],
   "keywords": [
     "agent-skills",
